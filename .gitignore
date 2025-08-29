@@ -55,6 +55,39 @@ Carthage/Build/
 # Instead, use fastlane to re-generate the screenshots whenever they are needed.
 # For more information about the recommended setup visit:
 # https://docs.fastlane.tools/best-practices/source-control/#source-control
+# 기존 내용 유지하고 아래 추가
+
+# macOS 시스템 파일
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Xcode 추가
+*.xccheckout
+*.xcscmblueprint
+DerivedData/
+*.moved-aside
+
+# SwiftUI Preview 관련
+.swiftpm/
+
+# 개인 설정 파일
+*.xcuserstate
+project.xcworkspace/
+
+# 임시 파일
+*.tmp
+*.swp
+*~
+
+# API 키 및 설정 파일 (보안)
+Config.plist
+GoogleService-Info.plist
+secrets.plist
 
 fastlane/report.xml
 fastlane/Preview.html
