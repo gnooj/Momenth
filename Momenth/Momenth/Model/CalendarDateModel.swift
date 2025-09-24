@@ -9,11 +9,13 @@ import Foundation
 
 struct CalendarDateModel {
     
-    let date : Date
+//    let date : Date
     let day : Int
-    var isToday : Bool
-    var isSelected : Bool
-    var isCurrentMonth : Bool
     let year : Int
+    let month: Int
+    let isToday : Bool
+    let isSelected : Bool
+    let isCurrentMonth : Int
+    
     
 }
