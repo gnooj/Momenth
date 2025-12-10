@@ -9,87 +9,66 @@ import Foundation
 
 
 class CalendarDateGenerator {
-    
+//    let vm = CalendarMonthViewModel()
+    let formatter = DateFormatter()
+
     var calendar = Calendar.current
+    var idCount = 1
     
-    
-    //    var isToday: (Int, Int,Int) {
-    //        let toDay = calendar.component(.day, from: Date())
-    //        let month = calendar.component(.month, from: Date())
-    //        let year = calendar.component(.year, from: Date())
-    //        return (toDay,month,year)
-    //    }
-    //    var toDayAndWeekday: (Int, Int) {
-    //        let toDay = calendar.component(.day, from: Date())
-    //        let weekday = calendar.component(.weekday, from: Date())
-    //        return (toDay, weekday)
-    //    }
-    
-    //현재 달의 첫날과 마지막날만큼 일자 생성
-    //isToday와 currentmonth설정까지 해주기
-    func createMonthViewModel() -> CalendarMonthModel {
+    func createMonths(for index : Int) -> CalendarMonthModel {
+        let offset = index - Global.CENTER_PAGE
         
-        let year = calendar.component(.year, from: Date())
-        let month = calendar.component(.month, from: Date())
-        let dates = createDates()
-        //
-        // 특정 년/월/일만 지정 (시간은 00:00:00)
+        let date  = calendar.date(byAdding: .month, value: offset, to: .now)!
+        formatter.dateFormat = "yyyy-MM"
+        
+        
+//        let date = calendar.date(byAdding: .month, value: index, to: .now)!
+        
+        let year = calendar.component(.year, from: date)
+        let month = calendar.component(.month, from: date)
+        
+        // MARK:    강제 언래핑
+        
+        
+        let dates = createDates(year : year, month : month, date : date)
+//---------------------- idCount 뭐가 바꿔야 할 거 같음
+        idCount += 1
        
-        
-        let result = CalendarMonthModel(year: year, month: month, dates: dates)
-        
-        return result
+        return CalendarMonthModel(id: idCount, year:year, month: month, dates: dates)
     }
     
-    private func createDates() -> [CalendarDateModel] {
+    private func createDates(year : Int ,month: Int, date: Date) -> [CalendarDateModel] {
+        
+        let monthRange = calendar.range(of: .day, in: .month, for: date)
+        guard let monthSize = monthRange?.count else { return [] }
+        
+        //달의 1일의 요일 계산 (1=일,2=월 ...)
+
         
 
+//        var prevMonthDateCount = firstWeekday - 1
+//        var nextMonthDateCount : Int { return 7-((prevMonthDateCount + monthSize) % 7) }
+//        var prevMonthRange : Int {
+//            
+//            guard let temp = calendar.date(byAdding: .month, value: -1, to: date) else {return 0}
+//            guard let ragneOfPrevMonth = calendar.range(of: .day, in: .month, for: temp) else { return 0 }
+//            return ragneOfPrevMonth.count
+//            
+//        }
+        
+        
         var dates: [CalendarDateModel] = []
-        
-        guard let monthInterval = calendar.dateInterval(of: .month, for: Date()) else {
-            
-            return []
-            
-        }
-        
-        print("\(monthInterval)")
-        
-        let lastDayOfMonth = calendar.date(byAdding: .day, value: -1, to: monthInterval.end)!
-        let monthSize = calendar.component(.day, from: lastDayOfMonth)
-        
-        //        let formatter = DateFormatter()
-        //            formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
-        //            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        //
-        //            print("첫날 (한국시간): \(firstDayOfMonth)")
-        //            print("마지막날 (한국시간): \(monthSize)")
-        //            print("현재시간 (한국시간): \(formatter.string(from: Date()))")
-        
-        // 1. 이전달,다음달,이번달을 합쳐서 만들껄 염두에 두고 만들어보자
-        // 일단은 today를 이용해서 이번달 뽑아주고 view에 그려보자 lazygrid사용
-        // 오늘 날짜를 구했으면 그 날짜를 기준으로 1일이 무슨요일인지 뽑는 알고리즘
+        // 전 달 일자 채워넣기
         
         
-        //        let day : Int
-        //        let year: Int
-        //        let month: Int
-        //        let isToday : Bool
-        //        let isSelected : Bool
-        //        let isCurrentMonth : Int
-        
-        //인스턴스 생성할떄 받아온 month랑 year값을 가지고 비교해야함
         
         for i in 1...monthSize {
-            //            if i == isToday{
-            //                CalendarDateModel(day: i,year: ,month: isToday: true, isSelected: true, isCurrentMonth: false)
-            //            }else{
-            //                CalendarDateModel(day: i, isToday: false, isSelected: false, isCurrentMonth: false)
-            //            }
             
-            dates.append(CalendarDateModel(day: i,year:2025 ,month:9, isToday: true, isSelected: true, isCurrentMonth: 9))
+            dates.append(CalendarDateModel(id: i ,day: i, year:year, month:month, isToday: true, isSelected: true, isCurrentMonth: 9))
+            //오늘을 어떻게 할지 고민해봐야함
             
         }
-        //이벤트 처리는 한쪽에 몰아서 처리할 예정이니까 그냥 day -몇일 +몇일 해서 생성하면 될듯
+        //다음달 일자 채워넣기
         
         
         

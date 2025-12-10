@@ -7,9 +7,10 @@
 
 import Foundation
 
-struct CalendarDateModel {
+struct CalendarDateModel : Identifiable, Hashable{
     
 //    let date : Date
+    let id : Int
     let day : Int
     let year : Int
     let month: Int

@@ -9,21 +9,34 @@ import SwiftUI
 
 struct DayCellView: View {
     
-    var day: Int
+    let calendarDateModel : CalendarDateModel?
     
+    var day: Int
+//    var monthKey: String
+    var index: Int
     
     var body: some View {
+        Button {
+            print("\(String(describing: calendarDateModel))")
+        } label: {
+            Text("\(calendarDateModel?.day ?? 0)")
+                .frame(width: 45, height: 73, alignment: .top)
+                .font(.title3)
+//                .background(Color(.systemGray3))
+                .cornerRadius(5)
+            
+        }
+        .buttonStyle(.plain)
+
+            
         
-        Text("\(day)")
-            .frame(width: 45, height: 73, alignment: .top)
-            .font(.title3)
-            .background(Color(.systemGray3))
-            .cornerRadius(5)
+
+        
             
     }
         
 }
 
 #Preview {
-    DayCellView(day: 1)
+    DayCellView(calendarDateModel: CalendarDateModel(id: 1, day: 1, year: 1, month: 1, isToday: true, isSelected: true, isCurrentMonth: 1),day: 1, index: 1200)
 }

@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6AE62C2B2ED99A9600D69E45 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 6AE62C2A2ED99A9600D69E45 /* Collections */; };
+		6AE62C2D2ED99A9600D69E45 /* DequeModule in Frameworks */ = {isa = PBXBuildFile; productRef = 6AE62C2C2ED99A9600D69E45 /* DequeModule */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		6A9044B62E702027007BEB2E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6AE62C2B2ED99A9600D69E45 /* Collections in Frameworks */,
+				6AE62C2D2ED99A9600D69E45 /* DequeModule in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,7 @@
 				6A9044A52E702025007BEB2E /* Momenth */,
 				6A9044B82E702027007BEB2E /* MomenthTests */,
 				6A9044C22E702027007BEB2E /* MomenthUITests */,
+				6AE62C292ED99A9600D69E45 /* Frameworks */,
 				6A9044A42E702025007BEB2E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +98,13 @@
 				6A9044BF2E702027007BEB2E /* MomenthUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6AE62C292ED99A9600D69E45 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +127,8 @@
 			);
 			name = Momenth;
 			packageProductDependencies = (
+				6AE62C2A2ED99A9600D69E45 /* Collections */,
+				6AE62C2C2ED99A9600D69E45 /* DequeModule */,
 			);
 			productName = Momenth;
 			productReference = 6A9044A32E702025007BEB2E /* Momenth.app */;
@@ -195,6 +212,9 @@
 			);
 			mainGroup = 6A90449A2E702025007BEB2E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6AE62C282ED998EC00D69E45 /* XCRemoteSwiftPackageReference "swift-collections" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6A9044A42E702025007BEB2E /* Products */;
 			projectDirPath = "";
@@ -406,7 +426,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -436,7 +456,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -562,6 +582,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6AE62C282ED998EC00D69E45 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6AE62C2A2ED99A9600D69E45 /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6AE62C282ED998EC00D69E45 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
+		};
+		6AE62C2C2ED99A9600D69E45 /* DequeModule */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6AE62C282ED998EC00D69E45 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = DequeModule;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6A90449B2E702025007BEB2E /* Project object */;
 }
