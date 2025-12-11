@@ -12,10 +12,7 @@ struct CalendarMonthModel : Identifiable{
     let year: Int
     let month: Int
     let dates : [CalendarDateModel]
-
-    
     var monthName : String {
         return "\(month) 월"
     }
-    
 }

@@ -13,19 +13,15 @@ struct MonthTitleView: View {
     
     var index : Int
     
+    
     var body: some View {
         HStack(alignment: .top) {
             
-            Text("\(index-Global.CENTER_PAGE)")
+            Text("\(calendarVM.getMonthTitle(for: index))")
                 .font(.largeTitle.bold())
-                
                 .padding(.leading, 30)
-
-            
             Spacer()
         }
-        
-        
     }
 }
 

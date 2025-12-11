@@ -13,4 +13,10 @@ extension Date {
         formatter.dateFormat = "yyyy-MM"
         return formatter.string(from: self)
     }
+    func today() -> Int {
+        
+        
+        return 0
+    }
 }
+

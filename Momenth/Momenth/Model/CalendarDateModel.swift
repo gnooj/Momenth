@@ -9,7 +9,12 @@ import Foundation
 
 struct CalendarDateModel : Identifiable, Hashable{
     
-//    let date : Date
+    enum DayType {
+            case previous   // 이전 달
+            case current    // 이번 달
+            case next       // 다음 달
+        }
+    
     let id : Int
     let day : Int
     let year : Int
@@ -17,6 +22,5 @@ struct CalendarDateModel : Identifiable, Hashable{
     let isToday : Bool
     let isSelected : Bool
     let isCurrentMonth : Int
-    
-    
+    let type : DayType
 }
