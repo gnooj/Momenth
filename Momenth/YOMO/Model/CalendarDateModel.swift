@@ -15,12 +15,16 @@ struct CalendarDateModel : Identifiable, Hashable{
             case next       // 다음 달
         }
     
-    let id : Int
+//    let id : Int
+    var id: Int {
+        pageIndex * 10000000 + year * 10000 + month * 100 + day  // 20250115
+    }
+    let pageIndex : Int
     let day : Int
     let year : Int
     let month: Int
     let isToday : Bool
-    let isSelected : Bool
+//    var isSelected : Bool
     let isCurrentMonth : Int
     let type : DayType
 }

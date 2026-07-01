@@ -10,11 +10,10 @@ import Foundation
 
 class CalendarDateGenerator {
     var calendar = Calendar.current
-    var idCount = 1
     let today : Int
     let thisMonth : Int
     var thisYear : Int
-
+    var callcounter : Int = 0
     
     init() {
         calendar.firstWeekday = 1
@@ -25,6 +24,8 @@ class CalendarDateGenerator {
     }
     
     func createMonths(for index : Int) -> [CalendarDateModel] {
+        print("call!---- \(callcounter)")
+        callcounter += 1
         let types : [CalendarDateModel.DayType] = [.previous,.current,.next]
         let offset = index - Global.CENTER_PAGE
         let standardDate = calendar.date(byAdding: .month, value: offset, to: .now)!
@@ -41,18 +42,13 @@ class CalendarDateGenerator {
             let date = calendar.date(byAdding: .month, value: offset+i, to: .now)!
             let year = calendar.component(.year, from: date)
             let month = calendar.component(.month, from: date)
-            dates.append(contentsOf: createDates(firstWeekday: firstWeekday,standardDateCount:standardDateCount,year: year, month: month,type:types[i+1] ,date : date))
+            dates.append(contentsOf: createDates(index: index,firstWeekday: firstWeekday,standardDateCount:standardDateCount,year: year, month: month,type:types[i+1] ,date : date))
         }
-        
-        
-        
-        //---------------------- idCount 뭐가 바꿔야 할 거 같음
-        idCount += 1
-        
+
         return dates
     }
     
-    private func createDates(firstWeekday: Int,standardDateCount : Int,year : Int, month: Int ,type : CalendarDateModel.DayType, date: Date) -> [CalendarDateModel] {
+    private func createDates(index: Int,firstWeekday: Int,standardDateCount : Int,year : Int, month: Int ,type : CalendarDateModel.DayType, date: Date) -> [CalendarDateModel] {
         
         
         let monthRange = calendar.range(of: .day, in: .month, for: date)
@@ -65,7 +61,7 @@ class CalendarDateGenerator {
         switch type {
             case .previous:
             for i in (monthSize - firstWeekday+2)..<(monthSize + 1) {
-                    dates.append(CalendarDateModel(id: i ,day: i, year:year, month:month, isToday: false, isSelected: false, isCurrentMonth: thisMonth,type: type))
+                dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: false, isCurrentMonth: thisMonth,type: type))
 //                print("dkfksdjfksdjf")
             }
 
@@ -73,9 +69,9 @@ class CalendarDateGenerator {
             for i in 1...monthSize {
                 
                 if year == thisYear && month == thisMonth && i == today {
-                    dates.append(CalendarDateModel(id: i ,day: i, year:year, month:month, isToday: true, isSelected: true, isCurrentMonth: thisMonth,type: type))
+                    dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: true,  isCurrentMonth: thisMonth,type: type))
                 }else {
-                    dates.append(CalendarDateModel(id: i ,day: i, year:year, month:month, isToday: false, isSelected: false, isCurrentMonth: thisMonth,type: type))
+                    dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: false,  isCurrentMonth: thisMonth,type: type))
                 }
                 
             }
@@ -86,7 +82,7 @@ class CalendarDateGenerator {
                 break
             }else{
                 for i in 1...minus{
-                        dates.append(CalendarDateModel(id: i ,day: i, year:year, month:month, isToday: false, isSelected: false, isCurrentMonth: thisMonth,type: type))
+                        dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: false,  isCurrentMonth: thisMonth,type: type))
                 }
             }
 

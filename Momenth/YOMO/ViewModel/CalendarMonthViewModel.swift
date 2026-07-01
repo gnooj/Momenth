@@ -8,16 +8,21 @@
 
 import Foundation
 import Collections
+import SwiftUI
 
 class CalendarMonthViewModel : ObservableObject{
     
+//    @Published var isSelected: Bool = false
+    @Published var monthCache : [Int : [CalendarDateModel]] = [:]
+    @Published var selectedId : Int? = nil
     
-    var monthCache : [Int : [CalendarDateModel]] = [:]
     var lastIndex : Int = Global.CENTER_PAGE
     let centerIndex: Int = Global.CENTER_PAGE
     let totalPage : Int = Global.MAX_PAGE
     var calendar = Calendar.current
     let generator : CalendarDateGenerator
+    let weeks = Array(repeating: GridItem(spacing: 0, alignment: .top), count: 7)
+    
 //    var dump : [CalendarMonthModel]
     
     
@@ -34,15 +39,15 @@ class CalendarMonthViewModel : ObservableObject{
     
     func onPageChanged(to index: Int) {
 
-        let direction = index - lastIndex
+//        let direction = index - lastIndex
         
-        if direction > 0 {
-            // 앞으로 갈 때: 다음 1개 미리 로드
-            _ = getMonthData(for: index+2)
-        } else if direction < 0 {
-            // 뒤로 갈 때: 이전 1개 미리 로드
-            _ = getMonthData(for: index-2)
-        }
+//        if direction > 0 {
+//            // 앞으로 갈 때: 다음 1개 미리 로드
+//            _ = getMonthData(for: index+2)
+//        } else if direction < 0 {
+//            // 뒤로 갈 때: 이전 1개 미리 로드
+//            _ = getMonthData(for: index-2)
+//        }
         lastIndex = index
     }
     
@@ -51,29 +56,10 @@ class CalendarMonthViewModel : ObservableObject{
         if let cachedData = self.monthCache[index] {
             return cachedData
         }
-        
-//        let date = convertToDate(for: index)
-//        let dateCount = calendar.range(of:.day, in : .month, for: date)!.count
-//        let firstDay = calendar.date(from: calendar.dateComponents([.year, .month], from: date))!
-//        
-//        var firstWeekday : Int {
-//            calendar.component(.weekday, from: firstDay)
-//        }
-//        
+
         let newData = generator.createMonths(for: index)
-        
-        
-//        let prevMonthData = monthCache[index-1]?.suffix(firstWeekday-1) ?? []
-//        let nextMonthData = monthCache[index+1]?.prefix(7-(((firstWeekday-1)+dateCount)%7)) ?? []
-////        let currentData = newData.dates
-//        
-//        
-//        let fullMonthData = prevMonthData + currentData + nextMonthData
-//        
+
         monthCache[index] = newData
-        
-        
-        
         return newData
     }
     
@@ -99,5 +85,13 @@ class CalendarMonthViewModel : ObservableObject{
         let date = self.convertToDate(for: index)
         let title = date.toMonthKey()
         return  title
+    }
+    
+    func selectDay (id: Int) -> Void {
+        selectedId = id
+ 
+    }
+    func isSelected(id: Int) -> Bool {
+        id == selectedId
     }
 }
