@@ -8,8 +8,20 @@
 import SwiftUI
 
 struct AddScheduleView: View {
+    @ObservedObject var calendarMonthVM = CalendarMonthViewModel()
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+                VStack{
+                    Rectangle()
+                        .cornerRadius(50)
+                        .containerRelativeFrame(.horizontal) { width, _ in
+                            width * 0.8
+                        }
+                        .containerRelativeFrame(.vertical) { height, _ in
+                            height * 0.6
+                        }
+                        .foregroundStyle(Color.accentColor)
+                }
     }
 }
 

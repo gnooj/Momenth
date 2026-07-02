@@ -6,3 +6,12 @@
 //
 
 import Foundation
+
+struct HolidayModel: Codable, Hashable, Identifiable {
+    var id = UUID()
+    let dateName: String
+//    let locdate: Int
+    let year: Int
+    let month: Int
+    let day: Int
+}

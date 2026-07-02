@@ -14,10 +14,19 @@ struct CalendarDateModel : Identifiable, Hashable{
             case current    // 이번 달
             case next       // 다음 달
         }
+    enum SaturdaySunday {
+        case saturday
+        case sunday
+        case weekdays
+    }
     
 //    let id : Int
     var id: Int {
-        pageIndex * 10000000 + year * 10000 + month * 100 + day  // 20250115
+        pageIndex * 10000000 + year * 10000 + month * 100 + day  // index년월일 = 1220250101
+    }
+    //holidayDicKey 를 여기서 관리하는게 맞는지 생각해보기
+    var holidayDicKey : Int{
+        (((year*100)+month)*100)+day
     }
     let pageIndex : Int
     let day : Int
@@ -27,4 +36,11 @@ struct CalendarDateModel : Identifiable, Hashable{
 //    var isSelected : Bool
     let isCurrentMonth : Int
     let type : DayType
+    var saturdaySunday : SaturdaySunday
+    
+    /**
+     let holyday : Bool
+    let holydayName : String
+     
+     **/
 }

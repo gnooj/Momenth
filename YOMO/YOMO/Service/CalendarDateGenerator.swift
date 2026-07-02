@@ -14,6 +14,7 @@ class CalendarDateGenerator {
     let thisMonth : Int
     var thisYear : Int
     var callcounter : Int = 0
+
     
     init() {
         calendar.firstWeekday = 1
@@ -24,9 +25,12 @@ class CalendarDateGenerator {
     }
     
     func createMonths(for index : Int) -> [CalendarDateModel] {
-        print("call!---- \(callcounter)")
+        Global.count = Global.count + 1
+        print("createMonths CALL\(Global.count)")
+//        print("call!---- \(callcounter)")
         callcounter += 1
-        let types : [CalendarDateModel.DayType] = [.previous,.current,.next]
+        let dayTypes : [CalendarDateModel.DayType] = [.previous,.current,.next]
+//        var saturdaySunday : [CalendarDateModel.SaturdaySunday] = [.saturday,.sunday,.weekdays]
         let offset = index - Global.CENTER_PAGE
         let standardDate = calendar.date(byAdding: .month, value: offset, to: .now)!
         let standardDateCount = calendar.range(of: .day, in: .month, for: standardDate)!.count
@@ -42,14 +46,27 @@ class CalendarDateGenerator {
             let date = calendar.date(byAdding: .month, value: offset+i, to: .now)!
             let year = calendar.component(.year, from: date)
             let month = calendar.component(.month, from: date)
-            dates.append(contentsOf: createDates(index: index,firstWeekday: firstWeekday,standardDateCount:standardDateCount,year: year, month: month,type:types[i+1] ,date : date))
+            let saturdaySundayType = CalendarDateModel.SaturdaySunday.weekdays
+            
+            dates.append(contentsOf: createDates(index: index,firstWeekday: firstWeekday,standardDateCount:standardDateCount,year: year, month: month,type:dayTypes[i+1],saturdaySunday:saturdaySundayType ,date : date))
         }
-
+        for i in 0 ..< dates.count{
+            let column = i % 7
+            
+            if column == 0 {
+                dates[i].saturdaySunday = .sunday
+            } else if column == 6 {
+                dates[i].saturdaySunday = .saturday
+            }
+        }
+//        print("ganerator call dates ========\(dates)")
         return dates
     }
     
-    private func createDates(index: Int,firstWeekday: Int,standardDateCount : Int,year : Int, month: Int ,type : CalendarDateModel.DayType, date: Date) -> [CalendarDateModel] {
+    private func createDates(index: Int,firstWeekday: Int,standardDateCount : Int,year : Int, month: Int ,type : CalendarDateModel.DayType, saturdaySunday: CalendarDateModel.SaturdaySunday,date: Date) -> [CalendarDateModel] {
         
+        Global.count = Global.count + 1
+        print("createDates CALL\(Global.count)")
         
         let monthRange = calendar.range(of: .day, in: .month, for: date)
         
@@ -61,17 +78,22 @@ class CalendarDateGenerator {
         switch type {
             case .previous:
             for i in (monthSize - firstWeekday+2)..<(monthSize + 1) {
-                dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: false, isCurrentMonth: thisMonth,type: type))
+                dates.append(CalendarDateModel(pageIndex: index, day: i, year: year, month: month, isToday: false, isCurrentMonth: thisMonth,type: type,saturdaySunday: saturdaySunday))
 //                print("dkfksdjfksdjf")
             }
-
+//            print()
+//            print("generator dic KEY == \((((year*100)+month)*100)+1)")
+//            print("holidaysMap ===== \(holidaysMap)")
+//            print()
+            
             case .current:
             for i in 1...monthSize {
                 
                 if year == thisYear && month == thisMonth && i == today {
-                    dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: true,  isCurrentMonth: thisMonth,type: type))
+                    dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: true,  isCurrentMonth: thisMonth,type: type,saturdaySunday: saturdaySunday))
+                    
                 }else {
-                    dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: false,  isCurrentMonth: thisMonth,type: type))
+                    dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: false,  isCurrentMonth: thisMonth,type: type,saturdaySunday: saturdaySunday))
                 }
                 
             }
@@ -82,13 +104,19 @@ class CalendarDateGenerator {
                 break
             }else{
                 for i in 1...minus{
-                        dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: false,  isCurrentMonth: thisMonth,type: type))
+                        dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: false,  isCurrentMonth: thisMonth,type: type,saturdaySunday: saturdaySunday))
                 }
             }
 
         }
         
+        
         //다음달 일자 채워넣기
         return dates
     }
+    func uqdateToday() -> Int {
+        
+    return 1200*10000000 + thisYear * 10000 + thisMonth * 100 + today
+    }
+
 }

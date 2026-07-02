@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import Momenth
+@testable import YOMO
 
 final class MomenthTests: XCTestCase {
 
