@@ -16,19 +16,19 @@ struct MainTabView: View {
               MonthView(calendarMonthVM: calendarMonthVM)
                 .tabItem {
                   Image(systemName: "1.square.fill")
-                  Text("Momenth")
+                  Text("YOMO")
                 }
-              Text("Another Tab")
+              Text("목표")
                 .tabItem {
-                  Image(systemName: "2.square.fill")
-                  Text("Challenge")
+                  Image(systemName: "star.fill")
+                  Text("목표")
                 }
               Text("The Last Tab")
                 .tabItem {
                   Image(systemName: "3.square.fill")
-                  Text("Third")
+                  Text("설정")
                 }
-                .badge(10)
+//                .badge(10)
             }
 //        .tabViewStyle()
         }
@@ -37,5 +37,5 @@ struct MainTabView: View {
 
 
 #Preview {
-    MainTabView(calendarMonthVM:CalendarMonthViewModel())
+    MainTabView(calendarMonthVM:CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository()))
 }

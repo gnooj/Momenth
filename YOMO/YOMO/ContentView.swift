@@ -8,10 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
-
-    @StateObject private var calendarMonthVM = CalendarMonthViewModel()
+    let holidayRepo : HolidayRepository
+    let scheduleRepo : ScheduleRepository
     
-    
+    @StateObject private var calendarMonthVM : CalendarMonthViewModel
+    init(holidayRepo: HolidayRepository, scheduleRepo: ScheduleRepository) {
+            self.holidayRepo = holidayRepo
+            self.scheduleRepo = scheduleRepo
+            _calendarMonthVM = StateObject(wrappedValue: CalendarMonthViewModel(
+                holidayRepo: holidayRepo,
+                scheduleRepo: scheduleRepo
+            ))
+        }
     var body: some View {
         
         MainTabView(calendarMonthVM: calendarMonthVM)
@@ -24,6 +32,6 @@ struct ContentView: View {
 
 
 #Preview {
-    ContentView()
+    ContentView(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository())
 }
 

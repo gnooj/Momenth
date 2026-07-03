@@ -13,7 +13,7 @@ struct DayCellView: View {
     @ObservedObject var calendarMonthVM : CalendarMonthViewModel
     // dayCellView에서 query로 필터링해서 불러온다음에 view에 보여지는거
     // VM에서 crud 를 해주기위해서 함수를 호출한다
-    @Query private var shcedulelist : [CalendarScheduleModel] // 필터링은 나중에
+    @Query private var shcedulelist : [ScheduleModel] // 필터링은 나중
     
     var calendarDateModel : CalendarDateModel
     
@@ -31,6 +31,7 @@ struct DayCellView: View {
             RoundedRectangle(cornerRadius: 5)
                     .fill(calendarDateModel.isToday ? Color.green : Color.clear)
                     .frame(width: 45, height: 73, alignment: .top)
+                    .containerShape(Rectangle())
                     
 
                     .overlay {
@@ -69,5 +70,5 @@ struct DayCellView: View {
         
 
 #Preview {
-    DayCellView(calendarMonthVM: CalendarMonthViewModel(),calendarDateModel: CalendarDateModel( pageIndex:1200,day: 24, year: 2026, month: 5, isToday: true,isCurrentMonth: 1,type:.previous,saturdaySunday: .sunday))
+    DayCellView(calendarMonthVM: CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository()),calendarDateModel: CalendarDateModel( pageIndex:1200,day: 24, year: 2026, month: 5, isToday: true,isCurrentMonth: 1,type:.previous,saturdaySunday: .sunday))
 }

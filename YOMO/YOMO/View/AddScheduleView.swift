@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AddScheduleView: View {
-    @ObservedObject var calendarMonthVM = CalendarMonthViewModel()
+    @ObservedObject var calendarMonthVM : CalendarMonthViewModel
     
     var body: some View {
                 VStack{
@@ -26,5 +26,5 @@ struct AddScheduleView: View {
 }
 
 #Preview {
-    AddScheduleView()
+    AddScheduleView(calendarMonthVM:CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository()))
 }

@@ -11,6 +11,9 @@ import SwiftData
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
+    
+    
+    
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 
@@ -22,12 +25,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct YOMOApp: App {
-
+    @StateObject private var holidayRepository = HolidayRepository()
+    @StateObject private var scheduleRepository = ScheduleRepository()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(holidayRepo: holidayRepository, scheduleRepo: scheduleRepository)
 
         }
-        .modelContainer(for: CalendarScheduleModel.self)
+        .modelContainer(for: ScheduleModel.self)
     }
 }

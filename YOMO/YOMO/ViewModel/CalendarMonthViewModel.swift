@@ -14,18 +14,12 @@ import Combine
 class CalendarMonthViewModel : ObservableObject{
     
     @Published var monthCache : [Int : [CalendarDateModel]] = [:]
-    @Published var selectedId : Int {
-        didSet {
-            if oldValue == selectedId {
-                addScheduleTrigger = true
-            }
-        }
-    }
+    @Published var selectedId : Int
     @Published var currentIndex : Int = Global.CENTER_PAGE
-    @Published var holidaysDictinonary : [Int : [HolidayModel]] = [:]
     @Published var addScheduleTrigger = false
-
-    
+    //전체 vm에 하나만 있는 휴일레포
+    var holidayRepo : HolidayRepository
+    var scheduleRepo : ScheduleRepository
     
     var dayOfTheWeek = Array(arrayLiteral: "일", "월", "화", "수", "목", "금", "토")
     let centerIndex: Int = Global.CENTER_PAGE
@@ -38,34 +32,28 @@ class CalendarMonthViewModel : ObservableObject{
     var anyCancellable: Set<AnyCancellable> = []
     var visitedYearIndices = [Int](repeating: 0, count: Global.MAX_PAGE/12) // index 100 = currentMonth
     let visitedYearIndicesMid = 100
-    var loadedYears = Set<Int>()
-    var isDubleClick = false
-//    var dump : [CalendarMonthModel]
-    
-    
-    init() {
-        //내가 지금 구분해야할거는 현제 인덱스는 그냥 그대로 계속 호출하게 만들고(달력은 보여야하니까)
-        //loadholiday()를 디바운싱걸어서 화면이 멈추고나서 불러오는걸로 바꿔야함
+
+    init(holidayRepo: HolidayRepository, scheduleRepo: ScheduleRepository) {
+        self.holidayRepo = holidayRepo
+        self.scheduleRepo = scheduleRepo
+
+
         calendar.firstWeekday = 1
         currentYear = calendar.component(.year, from: Date())
         currentMonth = calendar.component(.month, from: Date())
         self.generator = CalendarDateGenerator()
         selectedId = generator.uqdateToday()
         print("today==============\(selectedId)")
-
-            self.monthCache[centerIndex] = generator.createMonths(for: centerIndex)
-//        }
         
-        //MARK: - combine pipeline
-
-        setLunarHolidayDictinary()
-        setFixedHoliday(index: Global.CENTER_PAGE)
+        self.monthCache[centerIndex] = generator.createMonths(for: centerIndex)
+        holidayRepo.setLunarHolidayDictinary()
+        holidayRepo.setFixedHoliday(index: Global.CENTER_PAGE)
     }
-
+    
     func getMonthData(for index: Int){
         Global.count = Global.count + 1
         print("getMonthData CALL\(Global.count)")
-
+        
         let newData = generator.createMonths(for: index)
         
         monthCache[index] = newData
@@ -76,16 +64,19 @@ class CalendarMonthViewModel : ObservableObject{
     func monthGridViewDataUpdate(index: Int) {
         Global.count = Global.count + 1
         print("monthGridViewDataUpdate CALL\(Global.count)")
-//        monthGridViewData = getMonthData(for: index)
+        //        monthGridViewData = getMonthData(for: index)
         getMonthData(for: index)
         
     }
     
     // MARK: 일단 return에서 강제 언래핑 사용중
-
+    
     func convertToDate(for index: Int) -> Date {
         let offset = index - centerIndex
-        return calendar.date(byAdding: .month, value: offset, to: .now)!
+        guard let date = calendar.date(byAdding: .month, value: offset, to: .now) else {
+            return .now
+        }
+        return date
     }
     
     func getMonthTitle(for index: Int) -> String {
@@ -94,9 +85,13 @@ class CalendarMonthViewModel : ObservableObject{
         return  title
     }
     
-    func selectDay (id: Int) -> Void {
-        selectedId = id
- 
+    func selectDay (id: Int){
+        if selectedId == id {
+            addScheduleTrigger = true
+        }else {
+            selectedId = id
+        }
+        
     }
     
     // view에서 선택된 날짜 하이라이트 기능에서 쓰임
@@ -104,50 +99,22 @@ class CalendarMonthViewModel : ObservableObject{
         id == selectedId
     }
     
-
-    func setLunarHolidayDictinary() -> Void {
-
-        for item in HolidayData.lunar {
-            let key = (item.year * 100 + item.month) * 100 + item.day
-            holidaysDictinonary[key, default: []].append(item)
-        }
-
-        
-    }
-    func setFixedHoliday(index : Int) -> Void {
-
-        let offset = index - Global.CENTER_PAGE
-
-        
-        let targetDate = calendar.date(byAdding: .month, value: offset, to: Date())!
-        let centerYear = calendar.component(.year, from: targetDate)
-        for year in (centerYear - 5) ... (centerYear + 5){
-            guard !loadedYears.contains(year) else { continue }
-            loadedYears.insert(year)
-
-            for item in HolidayData.fixeditem {
-                let key = (year * 100 + item.1) * 100 + item.2
-                let model = HolidayModel(dateName: item.0, year: year, month: item.1, day: item.2)
-                holidaysDictinonary[key, default: []].append(model)
-            }
-        }
-        
-
-
-    }
+    
+    
+    
     
     
     func toYearMonth(from index: Int) -> Int {
         let offset = index - centerIndex
         let formatter = DateFormatter()
-            formatter.dateFormat = "yyyyMM"
-            formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
-            
-            guard let targetMonth = Calendar.current.date(byAdding: .month, value: offset, to: Date()),
-                  let result = Int(formatter.string(from: targetMonth)) else { return 0 }
-//            print("index : \(index), result: \(result)")
+        formatter.dateFormat = "yyyyMM"
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         
-            return result
+        guard let targetMonth = Calendar.current.date(byAdding: .month, value: offset, to: Date()),
+              let result = Int(formatter.string(from: targetMonth)) else { return 0 }
+        //            print("index : \(index), result: \(result)")
+        
+        return result
         
     }
     
@@ -155,7 +122,7 @@ class CalendarMonthViewModel : ObservableObject{
         monthGridViewDataUpdate(index: index)
     }
     func holidayName(for model: CalendarDateModel) -> [HolidayModel] {
-        holidaysDictinonary[model.holidayDicKey] ?? []
+        holidayRepo.holidaysDictionary[model.holidayDicKey] ?? []
     }
     
     func dateColor(for model: CalendarDateModel) -> Color {
@@ -172,10 +139,10 @@ class CalendarMonthViewModel : ObservableObject{
     }
     
     func checkHoliday(key : Int) -> Bool {
-        if holidaysDictinonary[key] != nil {
+        if holidayRepo.holidaysDictionary[key] != nil {
             return true
         }
         return false
     }
-
+    
 }
