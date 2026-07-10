@@ -8,23 +8,25 @@
 import SwiftUI
 
 struct AddScheduleView: View {
-    @ObservedObject var calendarMonthVM : CalendarMonthViewModel
+
+    @StateObject var scheduleVM : AddScheduleViewModel
     
+    
+    init(selectedDateModel: CalendarDateModel, addScheduleRepo: ScheduleRepository){
+        _scheduleVM = StateObject(wrappedValue: AddScheduleViewModel(
+            selectedDateModel: selectedDateModel,
+            addScheduleRepo: addScheduleRepo
+        ))
+    }
     var body: some View {
                 VStack{
-                    Rectangle()
-                        .cornerRadius(50)
-                        .containerRelativeFrame(.horizontal) { width, _ in
-                            width * 0.8
-                        }
-                        .containerRelativeFrame(.vertical) { height, _ in
-                            height * 0.6
-                        }
-                        .foregroundStyle(Color.accentColor)
+                    // 이 값들 monthview에서 내려받을 값들임
+//                    DayCellContent(calendarDateModel: <#T##CalendarDateModel#>, holidays: <#T##[HolidayModel]#>, dateColor: <#T##Color#>, isSelected: <#T##Bool#>)
                 }
+
     }
 }
 
 #Preview {
-    AddScheduleView(calendarMonthVM:CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository()))
+    AddScheduleView(selectedDateModel: CalendarDateModel.mock, addScheduleRepo: ScheduleRepository())
 }

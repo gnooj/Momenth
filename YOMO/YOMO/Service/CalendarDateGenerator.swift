@@ -14,7 +14,7 @@ class CalendarDateGenerator {
     let thisMonth : Int
     var thisYear : Int
     var callcounter : Int = 0
-
+    var todayDateModel : CalendarDateModel = CalendarDateModel(pageIndex: 1, day: 1, year: 1, month: 1, isToday: false, isCurrentMonth: 1, type: .current, saturdaySunday: .sunday)
     
     init() {
         calendar.firstWeekday = 1
@@ -91,7 +91,7 @@ class CalendarDateGenerator {
                 
                 if year == thisYear && month == thisMonth && i == today {
                     dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: true,  isCurrentMonth: thisMonth,type: type,saturdaySunday: saturdaySunday))
-                    
+                    todayDateModel = CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: true,  isCurrentMonth: thisMonth,type: type,saturdaySunday: saturdaySunday)
                 }else {
                     dates.append(CalendarDateModel(pageIndex:index,day: i, year:year, month:month, isToday: false,  isCurrentMonth: thisMonth,type: type,saturdaySunday: saturdaySunday))
                 }
@@ -114,9 +114,9 @@ class CalendarDateGenerator {
         //다음달 일자 채워넣기
         return dates
     }
-    func uqdateToday() -> Int {
+    func uqdateToday() -> CalendarDateModel {
         
-    return 1200*10000000 + thisYear * 10000 + thisMonth * 100 + today
+        return todayDateModel
     }
 
 }

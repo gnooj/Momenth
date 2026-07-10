@@ -14,6 +14,7 @@ import Combine
 class CalendarMonthViewModel : ObservableObject{
     
     @Published var monthCache : [Int : [CalendarDateModel]] = [:]
+    @Published var selectedDateModel : CalendarDateModel
     @Published var selectedId : Int
     @Published var currentIndex : Int = Global.CENTER_PAGE
     @Published var addScheduleTrigger = false
@@ -36,14 +37,15 @@ class CalendarMonthViewModel : ObservableObject{
     init(holidayRepo: HolidayRepository, scheduleRepo: ScheduleRepository) {
         self.holidayRepo = holidayRepo
         self.scheduleRepo = scheduleRepo
-
+        
 
         calendar.firstWeekday = 1
         currentYear = calendar.component(.year, from: Date())
         currentMonth = calendar.component(.month, from: Date())
         self.generator = CalendarDateGenerator()
-        selectedId = generator.uqdateToday()
-        print("today==============\(selectedId)")
+        self.selectedId = generator.todayDateModel.id
+        selectedDateModel = generator.uqdateToday()
+        print("today==============\(selectedDateModel)")
         
         self.monthCache[centerIndex] = generator.createMonths(for: centerIndex)
         holidayRepo.setLunarHolidayDictinary()
@@ -85,11 +87,12 @@ class CalendarMonthViewModel : ObservableObject{
         return  title
     }
     
-    func selectDay (id: Int){
-        if selectedId == id {
+    func selectDay (model: CalendarDateModel){
+        if selectedId == model.id {
             addScheduleTrigger = true
         }else {
-            selectedId = id
+            selectedId = model.id
+            selectedDateModel = model
         }
         
     }

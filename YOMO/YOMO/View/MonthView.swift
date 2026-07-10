@@ -10,7 +10,6 @@ import SwiftUI
 struct MonthView: View {
     
     @ObservedObject var calendarMonthVM : CalendarMonthViewModel
-    
 //    @State  var currentIndex : Int? = Global.CENTER_PAGE
     //MARK: 여기 viewmodel에서 관리하도록 바꿔야됨 ++ weekdayView만들기
     
@@ -91,7 +90,7 @@ struct MonthView: View {
                                 withAnimation(.easeInOut(duration: 0.1)) {calendarMonthVM.addScheduleTrigger = false}
                             }
                             .transition(.opacity)
-                        AddScheduleView(calendarMonthVM: calendarMonthVM)
+                        AddScheduleView(selectedDateModel: calendarMonthVM.selectedDateModel, addScheduleRepo: calendarMonthVM.scheduleRepo)
                     }
 
                 }
@@ -107,7 +106,7 @@ struct MonthView: View {
 struct MonthGridView : View  {
     
     @ObservedObject var calendarMonthVM : CalendarMonthViewModel
-    
+
     
     let index : Int
     var body: some View{
