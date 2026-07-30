@@ -23,6 +23,9 @@ struct ContentView: View {
     var body: some View {
         
         MainTabView(calendarMonthVM: calendarMonthVM)
+            .task {
+                calendarMonthVM.loadInitialHolidays()
+            }
 
     }
     

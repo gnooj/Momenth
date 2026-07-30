@@ -51,16 +51,28 @@ struct MonthView: View {
 //                            .background(.blue)
                             .scrollTargetBehavior(.paging)
                             .scrollIndicators(.hidden)
-                            .scrollPosition(id: Binding(get: {calendarMonthVM.currentIndex},
-                                                        set: { if let v = $0 { calendarMonthVM.currentIndex = v } }))
+                            .scrollPosition(id: Binding(
+                                get: { calendarMonthVM.currentIndex },
+                                set: { newValue in
+                                    guard let v = newValue else { return }
+                                    Task { @MainActor in
+                                        calendarMonthVM.currentIndex = v
+                                    }
+                                }
+                            ))
 
                             //MARK: go to taday
                             .overlay(alignment: .bottomTrailing){
                                 if calendarMonthVM.currentIndex != Global.CENTER_PAGE{
                                     GoToTodayButtonView(
-                                        currentIndex: Binding(get: { calendarMonthVM.currentIndex },
-                                                              set: { calendarMonthVM.currentIndex = $0 }
-                                                             )
+                                        currentIndex: Binding(
+                                            get: { calendarMonthVM.currentIndex },
+                                            set: { newValue in
+                                                Task { @MainActor in
+                                                    calendarMonthVM.currentIndex = newValue
+                                                }
+                                            }
+                                        )
                                     )
                                         .allowsHitTesting(true)
                                         .padding(.horizontal, 20)
@@ -90,7 +102,7 @@ struct MonthView: View {
                                 withAnimation(.easeInOut(duration: 0.1)) {calendarMonthVM.addScheduleTrigger = false}
                             }
                             .transition(.opacity)
-                        AddScheduleView(selectedDateModel: calendarMonthVM.selectedDateModel, addScheduleRepo: calendarMonthVM.scheduleRepo)
+                        AddScheduleView(selectedDateModel: calendarMonthVM.selectedDateModel, scheduleRepo: calendarMonthVM.scheduleRepo,holidays: calendarMonthVM.holidayName(for: calendarMonthVM.selectedDateModel),dateColor: calendarMonthVM.dateColor(for: calendarMonthVM.selectedDateModel), isSelected: calendarMonthVM.isSelected(id: calendarMonthVM.selectedDateModel.id))
                     }
 
                 }
@@ -117,6 +129,13 @@ struct MonthGridView : View  {
                     ForEach(calendarMonthVM.monthCache[index] ?? [], id: \.self.id){ weekday in
                         DayCellView(calendarMonthVM: calendarMonthVM, calendarDateModel: weekday)
                             .opacity(weekday.type != .current ? 0.2 : 1)
+                            .overlay{
+                                RoundedRectangle(cornerRadius: 5)
+                                    .strokeBorder(
+                                        calendarMonthVM.isSelected(id: weekday.id) ? Color.primary : Color.clear,
+                                        style: StrokeStyle(lineWidth: 2)
+                                    )
+                            }
     //                        .blur(radius: 3)
                     }
 //                    .background(.blue)
@@ -134,15 +153,19 @@ struct MonthGridView : View  {
         
 //        .background(.red)
         .onAppear{
+            Task{@MainActor in
+                calendarMonthVM.loadMonthGridViewData(index : index)
+                calendarMonthVM.holidayRepo.setFixedHoliday(index: index)
+            }
             print("sdkdfs")
 //            if !calendarMonthVM.monthGridViewLoded {
-            calendarMonthVM.loadMonthGridViewData(index : index)
-            calendarMonthVM.holidayRepo.setFixedHoliday(index: index)
+            
 
 //                calendarMonthVM.monthGridViewLoded = true
 //                print("index ======================= \(index)")
 //            }
         }
+
     }
     
 }

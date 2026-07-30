@@ -33,12 +33,12 @@ class CalendarMonthViewModel : ObservableObject{
     var anyCancellable: Set<AnyCancellable> = []
     var visitedYearIndices = [Int](repeating: 0, count: Global.MAX_PAGE/12) // index 100 = currentMonth
     let visitedYearIndicesMid = 100
-
+    
     init(holidayRepo: HolidayRepository, scheduleRepo: ScheduleRepository) {
         self.holidayRepo = holidayRepo
         self.scheduleRepo = scheduleRepo
         
-
+        
         calendar.firstWeekday = 1
         currentYear = calendar.component(.year, from: Date())
         currentMonth = calendar.component(.month, from: Date())
@@ -48,6 +48,10 @@ class CalendarMonthViewModel : ObservableObject{
         print("today==============\(selectedDateModel)")
         
         self.monthCache[centerIndex] = generator.createMonths(for: centerIndex)
+        //        holidayRepo.setLunarHolidayDictinary()
+        //        holidayRepo.setFixedHoliday(index: Global.CENTER_PAGE)
+    }
+    func loadInitialHolidays(){
         holidayRepo.setLunarHolidayDictinary()
         holidayRepo.setFixedHoliday(index: Global.CENTER_PAGE)
     }
@@ -64,8 +68,8 @@ class CalendarMonthViewModel : ObservableObject{
     }
     
     func monthGridViewDataUpdate(index: Int) {
-        Global.count = Global.count + 1
-        print("monthGridViewDataUpdate CALL\(Global.count)")
+        
+        guard monthCache[index] == nil else { return }
         //        monthGridViewData = getMonthData(for: index)
         getMonthData(for: index)
         

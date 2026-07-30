@@ -11,11 +11,11 @@ import Foundation
 //
 class AddScheduleViewModel: ObservableObject {
     let selectedDateModel : CalendarDateModel
-    private let addScheduleRepo : ScheduleRepository
+    private let scheduleRepo : ScheduleRepository
     
-    init(selectedDateModel: CalendarDateModel, addScheduleRepo: ScheduleRepository) {
+    init(selectedDateModel: CalendarDateModel, scheduleRepo: ScheduleRepository) {
         self.selectedDateModel = selectedDateModel
-        self.addScheduleRepo = addScheduleRepo
+        self.scheduleRepo = scheduleRepo
     }
     
 
