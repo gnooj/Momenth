@@ -25,8 +25,8 @@ class CalendarDateGenerator {
     }
     
     func createMonths(for index : Int) -> [CalendarDateModel] {
-        Global.count = Global.count + 1
-        print("createMonths CALL\(Global.count)")
+//        Global.count = Global.count + 1
+//        print("createMonths CALL\(Global.count)")
 //        print("call!---- \(callcounter)")
         callcounter += 1
         let dayTypes : [CalendarDateModel.DayType] = [.previous,.current,.next]
@@ -65,8 +65,8 @@ class CalendarDateGenerator {
     
     private func createDates(index: Int,firstWeekday: Int,standardDateCount : Int,year : Int, month: Int ,type : CalendarDateModel.DayType, saturdaySunday: CalendarDateModel.SaturdaySunday,date: Date) -> [CalendarDateModel] {
         
-        Global.count = Global.count + 1
-        print("createDates CALL\(Global.count)")
+//        Global.count = Global.count + 1
+//        print("createDates CALL\(Global.count)")
         
         let monthRange = calendar.range(of: .day, in: .month, for: date)
         
@@ -81,11 +81,7 @@ class CalendarDateGenerator {
                 dates.append(CalendarDateModel(pageIndex: index, day: i, year: year, month: month, isToday: false, isCurrentMonth: thisMonth,type: type,saturdaySunday: saturdaySunday))
 //                print("dkfksdjfksdjf")
             }
-//            print()
-//            print("generator dic KEY == \((((year*100)+month)*100)+1)")
-//            print("holidaysMap ===== \(holidaysMap)")
-//            print()
-            
+
             case .current:
             for i in 1...monthSize {
                 

@@ -37,5 +37,5 @@ struct MainTabView: View {
 
 
 #Preview {
-    MainTabView(calendarMonthVM:CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository()))
+    MainTabView(calendarMonthVM:CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: MockScheduleRepository.mock))
 }

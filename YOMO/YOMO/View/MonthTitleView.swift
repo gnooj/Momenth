@@ -26,5 +26,5 @@ struct MonthTitleView: View {
 }
 
 #Preview {
-    MonthTitleView(calendarVM : CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository()), index: 1199)
+    MonthTitleView(calendarVM : CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo:MockScheduleRepository.mock), index: 1199)
 }

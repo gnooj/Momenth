@@ -17,26 +17,19 @@ struct GoToTodayButtonView: View {
             if #available(iOS 26.0, *) {
                 Circle()
                     .fill(Color(red: 239/255, green: 97/255, blue:42/255))
-                //                .fill(.ultraThickMaterial)
-//                    .background(.regularMaterial)
                     .glassEffect(.regular.interactive())
                     .frame(width: 65, height: 111)
                     
             } else {
-                // Fallback on earlier versions
                 Circle()
                     .fill(Color(red: 239/255, green: 97/255, blue:42/255))
-                //                .fill(.ultraThickMaterial)
-//                    .background(.regularMaterial)
-//                    .glassEffect(.regular.interactive())
+
                     .frame(width: 65, height: 111)
             }
             
         }
         .overlay(
-//            Image(systemName: "arrow.uturn.left")
-//                .font(.system(size: 25, weight:.black))
-//                .foregroundStyle(.background)
+
             Text("Today")
                 .bold()
                 .foregroundStyle(.background)

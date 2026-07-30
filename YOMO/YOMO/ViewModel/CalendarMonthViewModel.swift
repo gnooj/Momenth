@@ -18,9 +18,10 @@ class CalendarMonthViewModel : ObservableObject{
     @Published var selectedId : Int
     @Published var currentIndex : Int = Global.CENTER_PAGE
     @Published var addScheduleTrigger = false
+    @Published var showingSheet: Bool = false
     //전체 vm에 하나만 있는 휴일레포
     var holidayRepo : HolidayRepository
-    var scheduleRepo : ScheduleRepository
+    var scheduleRepo : ScheduleRepositoryProtocol
     
     var dayOfTheWeek = Array(arrayLiteral: "일", "월", "화", "수", "목", "금", "토")
     let centerIndex: Int = Global.CENTER_PAGE
@@ -34,7 +35,7 @@ class CalendarMonthViewModel : ObservableObject{
     var visitedYearIndices = [Int](repeating: 0, count: Global.MAX_PAGE/12) // index 100 = currentMonth
     let visitedYearIndicesMid = 100
     
-    init(holidayRepo: HolidayRepository, scheduleRepo: ScheduleRepository) {
+    init(holidayRepo: HolidayRepository, scheduleRepo: ScheduleRepositoryProtocol) {
         self.holidayRepo = holidayRepo
         self.scheduleRepo = scheduleRepo
         
@@ -50,6 +51,12 @@ class CalendarMonthViewModel : ObservableObject{
         self.monthCache[centerIndex] = generator.createMonths(for: centerIndex)
         //        holidayRepo.setLunarHolidayDictinary()
         //        holidayRepo.setFixedHoliday(index: Global.CENTER_PAGE)
+        //MARK: -  combine 파이프라인 다시 공부
+        holidayRepo.objectWillChange
+            .sink {[weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in:&anyCancellable)
     }
     func loadInitialHolidays(){
         holidayRepo.setLunarHolidayDictinary()
@@ -57,8 +64,8 @@ class CalendarMonthViewModel : ObservableObject{
     }
     
     func getMonthData(for index: Int){
-        Global.count = Global.count + 1
-        print("getMonthData CALL\(Global.count)")
+//        Global.count = Global.count + 1
+//        print("getMonthData CALL\(Global.count)")
         
         let newData = generator.createMonths(for: index)
         
@@ -67,13 +74,7 @@ class CalendarMonthViewModel : ObservableObject{
         
     }
     
-    func monthGridViewDataUpdate(index: Int) {
-        
-        guard monthCache[index] == nil else { return }
-        //        monthGridViewData = getMonthData(for: index)
-        getMonthData(for: index)
-        
-    }
+    
     
     // MARK: 일단 return에서 강제 언래핑 사용중
     
@@ -93,10 +94,12 @@ class CalendarMonthViewModel : ObservableObject{
     
     func selectDay (model: CalendarDateModel){
         if selectedId == model.id {
-            addScheduleTrigger = true
+            showingSheet = true
+            print("같을때\(model.holidayDicKey)")
         }else {
             selectedId = model.id
             selectedDateModel = model
+            print("다를떄\(model.holidayDicKey)")
         }
         
     }
@@ -105,11 +108,6 @@ class CalendarMonthViewModel : ObservableObject{
     func isSelected(id: Int) -> Bool {
         id == selectedId
     }
-    
-    
-    
-    
-    
     
     func toYearMonth(from index: Int) -> Int {
         let offset = index - centerIndex
@@ -125,11 +123,28 @@ class CalendarMonthViewModel : ObservableObject{
         
     }
     
-    func loadMonthGridViewData (index : Int){
-        monthGridViewDataUpdate(index: index)
+    //    func loadMonthGridViewData (index : Int){
+    //        monthGridViewDataUpdate(index: index)
+    //    }
+    func monthGridViewDataUpdate(index: Int) {
+        
+        guard monthCache[index] == nil else { return }
+        //        monthGridViewData = getMonthData(for: index)
+        getMonthData(for: index)
+        
     }
-    func holidayName(for model: CalendarDateModel) -> [HolidayModel] {
-        holidayRepo.holidaysDictionary[model.holidayDicKey] ?? []
+    // 휴일과 일정을 같이 합쳐줄 코드 필요함 나중에는 특정 태그만 보고싶을때 필터링 할 수 있도록 하는 코드가 있어야하기 때문에 합쳐지는 쪽에서 태그보고 태그나오도록 만들어야함
+    func holidays(for model: CalendarDateModel) -> [HolidayModel] {
+        let holidays = holidayRepo.holidaysDictionary[model.holidayDicKey] ?? []
+
+        return holidays
+    }
+    
+    func schedules(for model: CalendarDateModel) -> [ScheduleModel] {
+        //지금 daycell 누를때마다 엄청많이 호출됨
+        scheduleRepo.schedules(on: model.holidayDicKey)
+
+//        schedulesByDay[model.holidayDicKey] ?? []
     }
     
     func dateColor(for model: CalendarDateModel) -> Color {
@@ -151,5 +166,6 @@ class CalendarMonthViewModel : ObservableObject{
         }
         return false
     }
+    
     
 }

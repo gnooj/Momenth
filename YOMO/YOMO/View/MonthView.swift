@@ -10,162 +10,152 @@ import SwiftUI
 struct MonthView: View {
     
     @ObservedObject var calendarMonthVM : CalendarMonthViewModel
-//    @State  var currentIndex : Int? = Global.CENTER_PAGE
-    //MARK: 여기 viewmodel에서 관리하도록 바꿔야됨 ++ weekdayView만들기
-    
-    
+    @State private var scrollID: Int? = Global.CENTER_PAGE
+    @State private var showingSheet: Bool = false
     var body: some View {
-
+        
+        VStack{
             VStack{
-                VStack{
+                
+                MonthTitleView(calendarVM: calendarMonthVM, index: calendarMonthVM.currentIndex)
+                
+                VStack {
+                    LazyVGrid(columns: calendarMonthVM.weeks, spacing: 0){
+                        ForEach(calendarMonthVM.dayOfTheWeek, id: \.self){ week in
+                            Text("\(week)")
+                                .font(.caption)
+                        }
+                        .frame(width: 360)
+                    }
+                }
+                .padding(.horizontal, 15)
+                
+                ScrollView(.horizontal){
+                    LazyHStack(alignment:.top,spacing: 0){//lazy로 했을때 문제 생각해보기
+                        ForEach(0...calendarMonthVM.totalPage, id: \.self){ index in
+                            MonthGridView(calendarMonthVM: calendarMonthVM, index: index)
+                                .containerRelativeFrame(.horizontal)
+                                .id(index)
+                        }//ForEach
+                        
+                    }//LazyHStack
+                    .scrollTargetLayout()
                     
-                    MonthTitleView(calendarVM: calendarMonthVM, index: calendarMonthVM.currentIndex)
-                    
-                    VStack {
-                        LazyVGrid(columns: calendarMonthVM.weeks, spacing: 0){
-                            ForEach(calendarMonthVM.dayOfTheWeek, id: \.self){ week in
-                                Text("\(week)")
-                                    .font(.caption)
-                            }
-                            .frame(width: 360)
+                }// ScrollView
+                .scrollTargetBehavior(.paging)
+                .scrollIndicators(.hidden)
+                .scrollPosition(id: $scrollID)
+                .onChange(of: scrollID) { _, newValue in
+                    if let v = newValue, v != calendarMonthVM.currentIndex {
+                        calendarMonthVM.currentIndex = v
+                    }
+                }
+                .onChange(of: calendarMonthVM.currentIndex) { _, newValue in
+                    if scrollID != newValue {
+                        withAnimation {
+                            scrollID = newValue
                         }
                     }
-                    .padding(.horizontal, 15)
-
-                            ScrollView(.horizontal){
-                                LazyHStack(alignment:.top,spacing: 0){//lazy로 했을때 문제 생각해보기
-                                    ForEach(0...calendarMonthVM.totalPage, id: \.self){ index in
-                                        MonthGridView(calendarMonthVM: calendarMonthVM, index: index)
-                                        //MARK: 여기 크기 가변으로 바꿔야함
-                                            .containerRelativeFrame(.horizontal)
-                                            .id(index)
-//                                            .background(.gray)
-                                    }//ForEach
-//                                    .background(.green)
-//                                    .frame(height:500)
-                                    
-                                }//LazyHStack
-                                .scrollTargetLayout()
-
-                            }// ScrollView
-//                            .background(.blue)
-                            .scrollTargetBehavior(.paging)
-                            .scrollIndicators(.hidden)
-                            .scrollPosition(id: Binding(
-                                get: { calendarMonthVM.currentIndex },
-                                set: { newValue in
-                                    guard let v = newValue else { return }
-                                    Task { @MainActor in
-                                        calendarMonthVM.currentIndex = v
-                                    }
-                                }
-                            ))
-
-                            //MARK: go to taday
-                            .overlay(alignment: .bottomTrailing){
-                                if calendarMonthVM.currentIndex != Global.CENTER_PAGE{
-                                    GoToTodayButtonView(
-                                        currentIndex: Binding(
-                                            get: { calendarMonthVM.currentIndex },
-                                            set: { newValue in
-                                                Task { @MainActor in
-                                                    calendarMonthVM.currentIndex = newValue
-                                                }
-                                            }
-                                        )
-                                    )
-                                        .allowsHitTesting(true)
-                                        .padding(.horizontal, 20)
-                                }
-                                
-                            }
-
-                    Text("vstack 안")
-                }// Vstack
-//                .background(.red)
-                Text("vstack 밖")
-                
-//                .background(.green)
-                
-//                VStack{
-//                    Text("KJDKJF")
-//                }
-////                .frame(width: 300, height: 300)
-//                .foregroundStyle(.red)
-                
-            }.overlay {
-                ZStack{
-                    if calendarMonthVM.addScheduleTrigger {
-                        Color.black.opacity(0.5)
-                            .ignoresSafeArea()
-                            .onTapGesture {
-                                withAnimation(.easeInOut(duration: 0.1)) {calendarMonthVM.addScheduleTrigger = false}
-                            }
-                            .transition(.opacity)
-                        AddScheduleView(selectedDateModel: calendarMonthVM.selectedDateModel, scheduleRepo: calendarMonthVM.scheduleRepo,holidays: calendarMonthVM.holidayName(for: calendarMonthVM.selectedDateModel),dateColor: calendarMonthVM.dateColor(for: calendarMonthVM.selectedDateModel), isSelected: calendarMonthVM.isSelected(id: calendarMonthVM.selectedDateModel.id))
-                    }
-
                 }
-            }
-        
-        
-        
-        
-        
+                .overlay(alignment: .bottomTrailing) {
+                    if calendarMonthVM.currentIndex != Global.CENTER_PAGE {
+                        GoToTodayButtonView(currentIndex: $calendarMonthVM.currentIndex)
+                            .allowsHitTesting(true)
+                            .padding(.horizontal, 20)
+                    }
+                }
+                Text("vstack 안")
+            }// Vstack
+            
+            Text("vstack 밖")
+            
+        }.overlay {
+//            ZStack{
+//                if calendarMonthVM.addScheduleTrigger {
+//                    Color.black.opacity(0.5)
+//                        .ignoresSafeArea()
+//                        .onTapGesture {
+//                            //MARK: - 여기 지금 바꿔야댐 전체 에니메이션으로 지금은 세이프에어리어 누를때만 들어가있음
+//                            withAnimation(.easeInOut(duration: 0.15)) {calendarMonthVM.addScheduleTrigger = false}
+//                            print("sdfsf\(calendarMonthVM.selectedDateModel.holidayDicKey)")
+//                        }
+//                        .transition(.opacity)
+//                    AddScheduleView(
+//                        selectedDateModel:calendarMonthVM.selectedDateModel,
+//                        scheduleRepo: calendarMonthVM.scheduleRepo,
+//                        addScheduleTrigger: $calendarMonthVM.addScheduleTrigger,
+//                        holidays:calendarMonthVM.holidays(for: calendarMonthVM.selectedDateModel),
+//                        dateColor: calendarMonthVM.dateColor(for: calendarMonthVM.selectedDateModel),
+//                        schedules: calendarMonthVM.schedules(for: calendarMonthVM.selectedDateModel)
+//                        
+//                    )
+//                    
+//                }
+//
+//                    
+//                
+//            }
+        }
     }
 }
 
 struct MonthGridView : View  {
     
     @ObservedObject var calendarMonthVM : CalendarMonthViewModel
-
+    
     
     let index : Int
     var body: some View{
         
         VStack(alignment: .leading){
             
-                LazyVGrid(columns: calendarMonthVM.weeks){
-                    ForEach(calendarMonthVM.monthCache[index] ?? [], id: \.self.id){ weekday in
-                        DayCellView(calendarMonthVM: calendarMonthVM, calendarDateModel: weekday)
-                            .opacity(weekday.type != .current ? 0.2 : 1)
-                            .overlay{
-                                RoundedRectangle(cornerRadius: 5)
-                                    .strokeBorder(
-                                        calendarMonthVM.isSelected(id: weekday.id) ? Color.primary : Color.clear,
-                                        style: StrokeStyle(lineWidth: 2)
-                                    )
-                            }
-    //                        .blur(radius: 3)
+            LazyVGrid(columns: calendarMonthVM.weeks){
+                ForEach(calendarMonthVM.monthCache[index] ?? [], id: \.self.id){ weekday in
+                    DayCellView(
+                        showingSheet: $calendarMonthVM.showingSheet,
+                        calendarMonthVM: calendarMonthVM,
+                        calendarDateModel: weekday,
+                        holidays: calendarMonthVM.holidays(for:weekday),
+                        dateColor: calendarMonthVM.dateColor(for: weekday),
+                        schedules: calendarMonthVM.schedules(for: weekday)
+                    )
+                    .sheet(isPresented: $calendarMonthVM.showingSheet) {
+                        AddScheduleView(
+                            selectedDateModel:calendarMonthVM.selectedDateModel,
+                            scheduleRepo: calendarMonthVM.scheduleRepo,
+                            addScheduleTrigger: $calendarMonthVM.addScheduleTrigger,
+                            holidays:calendarMonthVM.holidays(for: calendarMonthVM.selectedDateModel),
+                            dateColor: calendarMonthVM.dateColor(for: calendarMonthVM.selectedDateModel),
+                            schedules: calendarMonthVM.schedules(for: calendarMonthVM.selectedDateModel)
+                            
+                        )
                     }
-//                    .background(.blue)
-    //                Spacer()
+                        .opacity(weekday.type != .current ? 0.2 : 1)
+                        .overlay{
+                            RoundedRectangle(cornerRadius: 5)
+                                .strokeBorder(
+                                    calendarMonthVM.isSelected(id: weekday.id) ? Color.primary : Color.clear,
+                                    style: StrokeStyle(lineWidth: 2)
+                                )
+                            
+                        }
                 }
-//                .background(.red)
             }
-//        .background(.green)
-//        .frame(width: 100, height: 200)
-            
-            .padding()
-            .id(index)
-             
-//            Spacer()
+        }
         
-//        .background(.red)
+        .padding()
+        .id(index)
+        
         .onAppear{
             Task{@MainActor in
-                calendarMonthVM.loadMonthGridViewData(index : index)
+                calendarMonthVM.monthGridViewDataUpdate(index : index)
                 calendarMonthVM.holidayRepo.setFixedHoliday(index: index)
+                //                print("dslkjflskdjflskdjf")
             }
-            print("sdkdfs")
-//            if !calendarMonthVM.monthGridViewLoded {
             
-
-//                calendarMonthVM.monthGridViewLoded = true
-//                print("index ======================= \(index)")
-//            }
+            
         }
-
+        
     }
     
 }
@@ -173,5 +163,6 @@ struct MonthGridView : View  {
 
 
 #Preview {
-    MonthView(calendarMonthVM:CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository()))
+    //    MonthView(calendarMonthVM:CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: MockScheduleRepository()))
+    MonthView(calendarMonthVM: .mock)
 }

@@ -25,13 +25,35 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct YOMOApp: App {
-    @StateObject private var holidayRepository = HolidayRepository()
-    @StateObject private var scheduleRepository = ScheduleRepository()
+    private let modelContainer : ModelContainer
+    @StateObject private var holidayRepository : HolidayRepository
+    @StateObject private var scheduleRepository : ScheduleRepository
+    
+    init() {
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        do {
+            let container = try ModelContainer(for : ScheduleModel.self,configurations: configuration)
+            self.modelContainer = container
+            _holidayRepository = StateObject(wrappedValue: HolidayRepository())
+            _scheduleRepository = StateObject(wrappedValue: ScheduleRepository(context: container.mainContext))
+        }catch {
+            fatalError("modelcontainer 생성 실패\(error)")
+        }
+
+        
+    }
+    
+
+        
+        
+        
+
+    
     var body: some Scene {
         WindowGroup {
             ContentView(holidayRepo: holidayRepository, scheduleRepo: scheduleRepository)
 
         }
-        .modelContainer(for: ScheduleModel.self)
+        .modelContainer(modelContainer)
     }
 }

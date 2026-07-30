@@ -9,27 +9,28 @@ import SwiftUI
 import SwiftData
 
 struct DayCellView: View {
+    // 여기 vm을 각 셀마다 구독하는게 아니라 상위 계층에서 값만 내려보내는 걸로 바꿔야함
+    @Binding var showingSheet: Bool
+    let calendarMonthVM : CalendarMonthViewModel
     
-    @ObservedObject var calendarMonthVM : CalendarMonthViewModel
-    
-    // dayCellView에서 query로 필터링해서 불러온다음에 view에 보여지는거
-    // VM에서 crud 를 해주기위해서 함수를 호출한다
-//    @Query private var shcedulelist : [ScheduleModel] // 필터링은 나중
-    
+//    calendarDateModel: calendarDateModel
     var calendarDateModel : CalendarDateModel
+    var holidays: [HolidayModel]
+    var dateColor: Color
+    var schedules: [ScheduleModel]
+    
     
     
     var body: some View {
         Button {
-            print("\(String(describing: calendarDateModel.id))")
+//            calendarMonthVM.showingSheet.toggle()
             calendarMonthVM.selectDay(model: calendarDateModel)
-            print("date model info = \(calendarDateModel)")
-            print("\(calendarDateModel)")
+            
             
             // overlay활용해서 테두리 넣기
             
         } label: {
-            DayCellContentView(calendarDateModel: calendarDateModel, holidays: calendarMonthVM.holidayName(for: calendarDateModel), dateColor: calendarMonthVM.dateColor(for: calendarDateModel), isSelected: calendarMonthVM.isSelected(id: calendarDateModel.id))
+            DayCellContentView(calendarDateModel: calendarDateModel, holidays: holidays, dateColor: dateColor, schedules: schedules)
             
             }
         .buttonStyle(.plain)
@@ -43,5 +44,5 @@ struct DayCellView: View {
         
 
 #Preview {
-    DayCellView(calendarMonthVM: CalendarMonthViewModel(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository()),  calendarDateModel: CalendarDateModel(pageIndex: 1200, day: 5, year: 2026, month: 7, isToday: false, isCurrentMonth: 7, type: .current, saturdaySunday: .saturday))
+    DayCellView(showingSheet: .constant(true),calendarMonthVM: CalendarMonthViewModel.mock,  calendarDateModel: CalendarDateModel(pageIndex: 1200, day: 5, year: 2026, month: 7, isToday: false, isCurrentMonth: 7, type: .current, saturdaySunday: .saturday),holidays: CalendarMonthViewModel.mock.holidays(for: CalendarDateModel.mock),dateColor: CalendarMonthViewModel.mock.dateColor(for: CalendarDateModel.mock),schedules: CalendarMonthViewModel.mock.schedules(for :CalendarDateModel.mock))
 }

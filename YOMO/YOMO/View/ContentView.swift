@@ -9,10 +9,11 @@ import SwiftUI
 
 struct ContentView: View {
     let holidayRepo : HolidayRepository
-    let scheduleRepo : ScheduleRepository
+    let scheduleRepo : ScheduleRepositoryProtocol
     
     @StateObject private var calendarMonthVM : CalendarMonthViewModel
-    init(holidayRepo: HolidayRepository, scheduleRepo: ScheduleRepository) {
+    
+    init(holidayRepo: HolidayRepository, scheduleRepo: ScheduleRepositoryProtocol) {
             self.holidayRepo = holidayRepo
             self.scheduleRepo = scheduleRepo
             _calendarMonthVM = StateObject(wrappedValue: CalendarMonthViewModel(
@@ -20,7 +21,7 @@ struct ContentView: View {
                 scheduleRepo: scheduleRepo
             ))
         }
-    var body: some View {
+    var body: some View { 
         
         MainTabView(calendarMonthVM: calendarMonthVM)
             .task {
@@ -36,6 +37,6 @@ struct ContentView: View {
 
 
 #Preview {
-    ContentView(holidayRepo: HolidayRepository(), scheduleRepo: ScheduleRepository())
+    ContentView(holidayRepo: HolidayRepository(), scheduleRepo: MockScheduleRepository.mock)
 }
 
