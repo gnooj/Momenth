@@ -17,8 +17,7 @@ class CalendarMonthViewModel : ObservableObject{
     @Published var selectedDateModel : CalendarDateModel
     @Published var selectedId : Int
     @Published var currentIndex : Int = Global.CENTER_PAGE
-    @Published var addScheduleTrigger = false
-    @Published var showingSheet: Bool = false
+    @Published var scheduleSheet: ScheduleEditMode?
     //전체 vm에 하나만 있는 휴일레포
     var holidayRepo : HolidayRepository
     var scheduleRepo : ScheduleRepositoryProtocol
@@ -94,14 +93,19 @@ class CalendarMonthViewModel : ObservableObject{
     
     func selectDay (model: CalendarDateModel){
         if selectedId == model.id {
-            showingSheet = true
+//            showingSheet = true
             print("같을때\(model.holidayDicKey)")
+            // 나중에 여길 아무타입이나와도 되는걸로 바꾸자
+            scheduleSheet = .create(date: model)
         }else {
             selectedId = model.id
             selectedDateModel = model
             print("다를떄\(model.holidayDicKey)")
         }
         
+    }
+    func editSchedule(model: ScheduleModel) {
+        scheduleSheet = .edit(model)
     }
     
     // view에서 선택된 날짜 하이라이트 기능에서 쓰임

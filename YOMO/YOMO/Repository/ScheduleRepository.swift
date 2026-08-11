@@ -25,12 +25,12 @@ class ScheduleRepository : ObservableObject , ScheduleRepositoryProtocol{
 
     func insert(_ schedule: ScheduleModel) {
         context.insert(schedule)
-        try? context.save()
+        save()
         reload()
     }
     func delete(_ schedule: ScheduleModel) {
         context.delete(schedule)
-        try? context.save()
+        save()
         reload()
     }
     func reload()  {
@@ -48,6 +48,10 @@ class ScheduleRepository : ObservableObject , ScheduleRepositoryProtocol{
             schedulesByDay = [:]
         }
 
+    }
+    func save() {
+        try? context.save()
+        reload()
     }
 }
 
@@ -78,6 +82,9 @@ final class MockScheduleRepository: ScheduleRepositoryProtocol {
     }
     func delete(_ schedule: ScheduleModel) {
         storage.removeAll { $0 === schedule }
+        reload()
+    }
+    func save(){
         reload()
     }
 

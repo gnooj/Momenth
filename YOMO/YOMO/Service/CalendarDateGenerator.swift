@@ -14,9 +14,18 @@ class CalendarDateGenerator {
     let thisMonth : Int
     var thisYear : Int
     var callcounter : Int = 0
-    var todayDateModel : CalendarDateModel = CalendarDateModel(pageIndex: 1, day: 1, year: 1, month: 1, isToday: false, isCurrentMonth: 1, type: .current, saturdaySunday: .sunday)
+    var todayDateModel : CalendarDateModel
     
     init() {
+        todayDateModel = CalendarDateModel(
+            pageIndex: Global.CENTER_PAGE,
+            day: calendar.component(.day, from: Date()),
+            year: calendar.component(.year, from: Date()),
+            month: calendar.component(.month, from: Date()),
+            isToday: true, isCurrentMonth: calendar.component(.month, from: Date()),
+            type: .current,
+            saturdaySunday: .weekdays
+        )
         calendar.firstWeekday = 1
         today = calendar.component(.day, from: .now)
         thisMonth = calendar.component(.month, from: .now)

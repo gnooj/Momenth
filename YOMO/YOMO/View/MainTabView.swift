@@ -13,7 +13,7 @@ struct MainTabView: View {
     var body: some View {
         
         TabView {
-              MonthView(calendarMonthVM: calendarMonthVM)
+              CalendarView(calendarMonthVM: calendarMonthVM)
                 .tabItem {
                   Image(systemName: "1.square.fill")
                   Text("YOMO")

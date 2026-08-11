@@ -6,77 +6,128 @@
 //
 
 import Foundation
+
+
+enum ScheduleEditMode : Identifiable{
+    case create(date: CalendarDateModel)
+    case edit(ScheduleModel)
+    var id: String {
+            switch self {
+            case .create(let d): "create-\(d.year)-\(d.month)-\(d.day)"
+            case .edit(let s):   "edit-\(s.id)"
+            }
+        }
+}
+extension CalendarDateModel {
+        init(date: Date){
+        let calendar = Calendar.current
+        let c = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        let weekday = calendar.component(.weekday, from: date)
+        var weekdayType: CalendarDateModel.SaturdaySunday = .weekdays
+        if weekday == 1 {
+            weekdayType = .sunday
+        }else if weekday == 7 {
+            weekdayType = .saturday
+        }
+        self.init(pageIndex: 0, day: c.day ?? 0, year: c.year ?? 0 , month: c.month ?? 0, isToday: calendar.isDateInToday(date), isCurrentMonth: 0, type: .current, saturdaySunday: weekdayType)
+    }
+}
+extension ScheduleEditMode {
+    var dateModel: CalendarDateModel {
+        switch self {
+        case .create(let date): date
+        case .edit(let schedule):
+            CalendarDateModel(date: schedule.startDate)
+        }
+    }
+}
 // 일단 asvm 에서 보여줄건 클린된 날짜 정보
 // View 에서 id 보내주면 그거 받아서 처리할 함수
 //
 class AddScheduleViewModel: ObservableObject {
+    let cal = Calendar.current
     @Published var title: String = ""
-    @Published var startDate: Date
+    @Published var startDate: Date {
+        didSet {
+            endDate = Self.hourOnTheHour(date: startDate, addingHour: 1, minute: cal.component(.minute, from: startDate))
+            if endDate < startDate {
+                endDate = Self.hourOnTheHour(date: startDate, addingHour: 1)
+            }
+        }
+    }
     @Published var endDate: Date
     @Published var isRepeating: Bool = false
     @Published var notification: Bool = false
     @Published var memo: String = ""
     
-    let selectedDateModel : CalendarDateModel
+    
+    let mode : ScheduleEditMode
+//    let selectedDateModel : CalendarDateModel
     private let scheduleRepo : ScheduleRepositoryProtocol
     
 //    let hour : Date
     
-    init(selectedDateModel: CalendarDateModel, scheduleRepo: ScheduleRepositoryProtocol) {
-        self.selectedDateModel = selectedDateModel
+    init(scheduleRepo: ScheduleRepositoryProtocol, mode : ScheduleEditMode) {
         self.scheduleRepo = scheduleRepo
-        self.startDate = Self.hourOnTheHour(model : selectedDateModel)
-        self.endDate = Self.hourOnTheHour(model: selectedDateModel, addingHour: 1)
-//        self.hour = AddScheduleViewModel.currentHour()
+        
+        
+        self.mode = mode
+        
+        switch mode {
+        case .create(let date):
+            let cal = Calendar.current
+            var c = DateComponents()
+            c = cal.dateComponents([.hour, .minute], from: Date())
+            c.year = date.year
+            c.month = date.month
+            c.day = date.day
+            let current = cal.date(from: c)
+            self.startDate = Self.hourOnTheHour(date : current ?? Date())
+            self.endDate = Self.hourOnTheHour(date: current  ?? Date(), addingHour: 1)
+            
+        case .edit(let schedule):
+            title = schedule.title
+            startDate = schedule.startDate
+            endDate = schedule.endDate
+            isRepeating = schedule.isRepeating ?? false
+            notification = schedule.notification ?? false
+            memo = schedule.memo ?? ""
+            
+        }
     }
+    // 만약에 여러날짜에 걸쳐있는 일정이 들어오면 일자마다 일정을 다 추가해주는 코드를 만들어야함 vm에서는 데이터를 합치기만하고 일자를 실제로 등록할때는 repo에서 하게끔 만들기
+    //startdate가 변경되면 enddate도 바꿔주고 enddate에서는 따로 설정 x 하는 코드
     func complete (){
+        guard !title.isEmpty else { return }// 제목이 비어있으면 채우라고 말하는 코드 필요
+        switch mode {
+        case .create:
+            
+            try? scheduleRepo.insert(ScheduleModel(title: title, startDate: startDate, endDate: endDate, isRepeating: isRepeating, notification: notification ,memo: memo))
+        case .edit(let schedule):
+            schedule.title = title
+            schedule.startDate = startDate
+            schedule.endDate = endDate
+            schedule.isRepeating = isRepeating
+            schedule.notification = notification
+            schedule.memo = memo
+            scheduleRepo.save()
+        }
+        
         print("complete start date == \(startDate)")
-        try? scheduleRepo.insert(ScheduleModel(title: title, startDate: startDate, endDate: endDate, isRepeating: isRepeating, notification: notification ,memo: memo))
         
-//      ScheduleModel(title: <#T##String#>, startDate: <#T##Int#>, endDate: <#T##Int#>)
-    }
-//    private static func hourOnTheHosur() -> Date {
-//        let current = Calendar.current
-//        let hour = current.component(.hour, from: Date())
-////        let comps = result.dateComponents([.year, .month, .day, .hour], from: Date())
-//        return current.date(bySettingHour: hour, minute: 0, second: 0, of: Date()) ?? Date()
-////        return Date()
-//    }
-    private static func hourOnTheHour(model : CalendarDateModel, addingHour value : Int = 0) -> Date {
-        let current = Calendar.current
-        var c = DateComponents()
-        c.year = model.year
-        c.month = model.month
-        c.day = model.day
-        c.hour = current.component(.hour, from:Date()) + value
-        c.minute = 0
         
-        return current.date(from: c) ?? Date()
     }
-    // 내가 보내야할 데이터
-    // 1. 제목
-    // 2. 시작,종료 date 정보
-    // 3. 반복 여부 , 알림 여부
-    // 4. 메모
-    /*
-     @State var title: String = ""
-     @State var memo: String = ""
-     @State var notification: Bool = false
-     @State var isRepeating: Bool = false
-     @State var startDate: Date = Date()
-     @State var endDate: Date = Date()
-     @Binding var addScheduleTrigger: Bool
 
-     하나씩 받아서 배열에 넣고 그 배열을 vm에 전달 -> vm에서 꺼내서 model에 저장해서 스케쥴 레포로 넘김 -> 여기서
-     var year : Int = 0
-     var month : Int = 0
-     var day : Int = 0
-     var id : UUID = UUID()
-     var title : String = ""
-     var startDate : Int = 0
-     var endDate : Int = 0
-     var notification : Bool = false
-     var isRepeat : Bool = false
-     var memo : String = ""
-     */
+    private static func hourOnTheHour(date : Date, addingHour value : Int = 0, minute : Int = 0) -> Date {
+        let current = Calendar.current
+        
+        var c = current.dateComponents([.year,.month,.day, .hour], from: date)
+        c.minute = minute
+        let base = current.date(from: c) ?? date
+        
+        
+        
+        return current.date(byAdding: .hour, value: value, to: base) ?? base
+    }
+
 }

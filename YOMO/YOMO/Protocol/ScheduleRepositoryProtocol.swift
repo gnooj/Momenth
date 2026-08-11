@@ -12,5 +12,6 @@ protocol ScheduleRepositoryProtocol {
     func schedules(on dayKey: Int) -> [ScheduleModel]
     func insert(_ schedule: ScheduleModel) throws
     func delete(_ schedule: ScheduleModel) throws
-    func reload() 
+    func reload()
+    func save()
 }

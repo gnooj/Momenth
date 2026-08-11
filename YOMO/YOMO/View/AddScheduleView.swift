@@ -8,49 +8,51 @@
 import SwiftUI
 
 struct AddScheduleView: View {
-    
+    @Environment(\.dismiss) private var dismiss
     @StateObject var scheduleVM : AddScheduleViewModel
-    @Binding var addScheduleTrigger: Bool
+
     //vm에서 받아야할 변수
     var holidays : [HolidayModel]
     var dateColor : Color
     var schedules: [ScheduleModel]
-    
+    let mode : ScheduleEditMode
 
     
-    init(selectedDateModel: CalendarDateModel, scheduleRepo: ScheduleRepositoryProtocol,addScheduleTrigger:Binding<Bool>,holidays: [HolidayModel], dateColor: Color,  schedules: [ScheduleModel]){
+    init(scheduleRepo: ScheduleRepositoryProtocol,holidays: [HolidayModel], dateColor: Color,  schedules: [ScheduleModel], mode : ScheduleEditMode){
         
         _scheduleVM = StateObject(wrappedValue: AddScheduleViewModel(
-            selectedDateModel: selectedDateModel,
-            scheduleRepo: scheduleRepo
+            scheduleRepo: scheduleRepo, mode: mode
         ))
         self.holidays = holidays
         self.dateColor = dateColor
         self.schedules = schedules
-        _addScheduleTrigger = addScheduleTrigger
+        self.mode = mode
     }
     
     var body: some View {
         VStack(alignment: .leading){
 
             HStack(){
-                DayCellContentView(calendarDateModel: scheduleVM.selectedDateModel, holidays: holidays, dateColor: dateColor,schedules: schedules)
+                DayCellContentView(calendarDateModel: mode.dateModel, holidays: holidays, dateColor: dateColor,schedules: schedules)
                 
-                Text("\(String(scheduleVM.selectedDateModel.year))년\(String(scheduleVM.selectedDateModel.month))월\(String(scheduleVM.selectedDateModel.day))일")
+                Text("\(String(mode.dateModel.year))년\(String(mode.dateModel.month))월\(String(mode.dateModel.day))일")
+                Spacer()
                 Button {
                     scheduleVM.complete()
-                    addScheduleTrigger = false
+                    dismiss()
                 } label: {
-                    Text("완료")
-                        .foregroundStyle(Color.black)
-                        .padding(10)
+                    Image(systemName: "checkmark")
+                        .frame(width: 50, height: 50)
+                        .foregroundStyle(.white)
+                        .bold()
                         .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(.red)
+                            Circle()
+                                .fill(.green)
                         )
                 }
+                
             }
-            .padding(10)
+            .padding(20)
             
             Form{
                 HStack{
@@ -62,7 +64,7 @@ struct AddScheduleView: View {
                 }
                 HStack{
                     
-                    DatePicker("종료", selection: $scheduleVM.endDate, displayedComponents: [.date, .hourAndMinute])
+                    DatePicker("종료", selection: $scheduleVM.endDate,in: scheduleVM.startDate..., displayedComponents: [.date, .hourAndMinute])
                 }
                 HStack{
                     Toggle("반복", isOn: $scheduleVM.isRepeating)
@@ -82,9 +84,16 @@ struct AddScheduleView: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.gray))
         )
+        .ignoresSafeArea()
     }
 }
 
 #Preview {
-    AddScheduleView(selectedDateModel: CalendarDateModel.mock, scheduleRepo: MockScheduleRepository(schedules: []),addScheduleTrigger: .constant(true), holidays:CalendarMonthViewModel.mock.holidays(for: CalendarDateModel.mock),dateColor: CalendarMonthViewModel.mock.dateColor(for: CalendarDateModel.mock),schedules: CalendarMonthViewModel.mock.schedules(for :CalendarDateModel.mock))
+    AddScheduleView(
+        scheduleRepo: MockScheduleRepository(schedules: []),
+        holidays:CalendarMonthViewModel.mock.holidays(for: CalendarDateModel.mock),
+        dateColor: CalendarMonthViewModel.mock.dateColor(for: CalendarDateModel.mock),
+        schedules: CalendarMonthViewModel.mock.schedules(for :CalendarDateModel.mock),
+        mode: .create(date: CalendarDateModel.mock)
+    )
 }

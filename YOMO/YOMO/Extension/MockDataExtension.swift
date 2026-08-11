@@ -34,3 +34,13 @@ extension MockScheduleRepository {
         ])
     }
 }
+extension ScheduleModel {
+    static let mock = ScheduleModel(
+        title: "회의",
+        startDate: Date(),
+        endDate: Date().addingTimeInterval(3600),
+        isRepeating: false,
+        notification: false,
+        memo: "메모"
+    )
+}

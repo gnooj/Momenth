@@ -16,31 +16,32 @@ struct DayCellContentView : View {
         
         RoundedRectangle(cornerRadius: 5)
             .fill(calendarDateModel.isToday ? Color.green : Color(.systemBackground))
-                .frame(width: 45, height: 73, alignment: .top)
+                .frame(width: 50, height: 77, alignment: .top)
                 .containerShape(Rectangle())
                 
 
                 .overlay {
-                    Text("\(calendarDateModel.day)")
-                        .frame(width: 45, height: 73, alignment: .top)
-                        .font(.title3)
                     VStack{
+                        Text("\(calendarDateModel.day)")
+                            .font(.subheadline)
                         ForEach(holidays, id: \.self){ holiday in
                                 Text("\(holiday.dateName)")
                                     .lineLimit(1)
-                                    .font(.caption2)
+                                    .font(.system(size: 9))
                                     .fontWeight(.semibold)
                                     .foregroundStyle(.red)
                         }
                         ForEach(schedules, id: \.id){ schedule in
                                 Text("\(schedule.title)")
                                     .lineLimit(1)
-                                    .font(.caption2)
+                                    .font(.system(size: 9))
                                     .fontWeight(.semibold)
                                     .foregroundStyle(.cyan)
                         }
                         
                     }
+                    .frame(width: 45, height: 73, alignment: .top)
+                    
                 }
                 .foregroundStyle(dateColor)
 

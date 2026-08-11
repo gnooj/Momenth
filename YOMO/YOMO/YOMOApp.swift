@@ -52,6 +52,7 @@ struct YOMOApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(holidayRepo: holidayRepository, scheduleRepo: scheduleRepository)
+                .environment(\.locale, Locale(identifier: "ko_KR"))
 
         }
         .modelContainer(modelContainer)
