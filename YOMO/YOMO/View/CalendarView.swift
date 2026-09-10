@@ -11,6 +11,11 @@ struct CalendarView: View {
     
     @ObservedObject var calendarMonthVM : CalendarMonthViewModel
     @State private var scrollID: Int? = Global.CENTER_PAGE
+    private let cellHeight: CGFloat = 90
+
+    private var gridHeight: CGFloat {
+        CGFloat(calendarMonthVM.weekCount(for: calendarMonthVM.currentIndex)) * cellHeight
+    }
 //    @State private var showingSheet: Bool = false
     var body: some View {
         ScrollView {
@@ -26,11 +31,11 @@ struct CalendarView: View {
                                 Text("\(week)")
                                     .font(.caption)
                             }
-                            .frame(width: 360)
+//                            .frame(width: 360)
     //                        .background(.blue)
                         }
                     }
-                    .padding(.horizontal, 15)
+//                    .padding(.horizontal, 15)
                     
                     ScrollView(.horizontal){
                         LazyHStack(alignment:.top,spacing: 0){//lazy로 했을때 문제 생각해보기
@@ -40,14 +45,15 @@ struct CalendarView: View {
     //                                .containerRelativeFrame(.vertical)
     //                                .frame(maxWidth: /*500*/)
                                     .id(index)
-                                    .background(.green)
+//                                    .background(.green)
                             }//ForEach
                             
                         }//LazyHStack
                         .scrollTargetLayout()
                         
                     }// ScrollView
-                    .frame(height: 530)
+                    .frame(height: gridHeight)
+                        .animation(.easeInOut(duration: 0.25), value: gridHeight)
                     .scrollTargetBehavior(.paging)
                     .scrollIndicators(.hidden)
                     .scrollPosition(id: $scrollID)
@@ -114,16 +120,20 @@ struct MonthGridView : View  {
         
         VStack(){
             
-            LazyVGrid(columns: calendarMonthVM.weeks){
+            LazyVGrid(columns: calendarMonthVM.weeks, spacing: 0){
                 ForEach(calendarMonthVM.monthCache[index] ?? [], id: \.self.id){ weekday in
                     DayCellView(
 //                        showingSheet: $calendarMonthVM.showingSheet,
-                        calendarMonthVM: calendarMonthVM,
+//                        calendarMonthVM: calendarMonthVM,
                         calendarDateModel: weekday,
                         holidays: calendarMonthVM.holidays(for:weekday),
                         dateColor: calendarMonthVM.dateColor(for: weekday),
                         schedules: calendarMonthVM.schedules(for: weekday)
-                    )
+                    ) { model in
+                        calendarMonthVM.selectDay(model: model)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 90, maxHeight: 90, alignment: .top)
+//                    .aspectRatio(16/9, contentMode: .fit)
                     .opacity(weekday.type != .current ? 0.2 : 1)
                     .overlay{
                         // 선택되면 약간 빛나는 느낌으로
@@ -139,17 +149,14 @@ struct MonthGridView : View  {
                     
             }
         }
-        
-        .padding()
-        .id(index)
-        
+//        .padding()
+//        .id(index)
         .onAppear{
-            Task{@MainActor in
                 calendarMonthVM.monthGridViewDataUpdate(index : index)
                 //MARK:  onappear될때 마다 호출 되는거 바꾸기
                 calendarMonthVM.holidayRepo.setFixedHoliday(index: index)
                 //                print("dslkjflskdjflskdjf")
-            }
+            
             
             
         }

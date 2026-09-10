@@ -15,12 +15,18 @@ class CalendarMonthViewModel : ObservableObject{
     
     @Published var monthCache : [Int : [CalendarDateModel]] = [:]
     @Published var selectedDateModel : CalendarDateModel
-    @Published var selectedId : Int
-    @Published var currentIndex : Int = Global.CENTER_PAGE
+    //    @Published var selectedId : Int
+    @Published var currentIndex : Int = Global.CENTER_PAGE {
+        didSet {
+            updateSelectedModel()
+        }
+    }
     @Published var scheduleSheet: ScheduleEditMode?
     //전체 vm에 하나만 있는 휴일레포
     var holidayRepo : HolidayRepository
     var scheduleRepo : ScheduleRepositoryProtocol
+    
+    var todayDateModel : CalendarDateModel
     
     var dayOfTheWeek = Array(arrayLiteral: "일", "월", "화", "수", "목", "금", "토")
     let centerIndex: Int = Global.CENTER_PAGE
@@ -43,8 +49,9 @@ class CalendarMonthViewModel : ObservableObject{
         currentYear = calendar.component(.year, from: Date())
         currentMonth = calendar.component(.month, from: Date())
         self.generator = CalendarDateGenerator()
-        self.selectedId = generator.todayDateModel.id
-        selectedDateModel = generator.uqdateToday()
+        //        self.selectedId = generator.todayDateModel.id
+        todayDateModel = generator.todayDateModel
+        selectedDateModel = generator.todayDateModel
         print("today==============\(selectedDateModel)")
         
         self.monthCache[centerIndex] = generator.createMonths(for: centerIndex)
@@ -63,8 +70,8 @@ class CalendarMonthViewModel : ObservableObject{
     }
     
     func getMonthData(for index: Int){
-//        Global.count = Global.count + 1
-//        print("getMonthData CALL\(Global.count)")
+        //        Global.count = Global.count + 1
+        //        print("getMonthData CALL\(Global.count)")
         
         let newData = generator.createMonths(for: index)
         
@@ -92,13 +99,13 @@ class CalendarMonthViewModel : ObservableObject{
     }
     
     func selectDay (model: CalendarDateModel){
-        if selectedId == model.id {
-//            showingSheet = true
+        if selectedDateModel.id == model.id {
+            //            showingSheet = true
             print("같을때\(model.holidayDicKey)")
             // 나중에 여길 아무타입이나와도 되는걸로 바꾸자
             scheduleSheet = .create(date: model)
         }else {
-            selectedId = model.id
+            //            selectedId = model.id
             selectedDateModel = model
             print("다를떄\(model.holidayDicKey)")
         }
@@ -110,7 +117,7 @@ class CalendarMonthViewModel : ObservableObject{
     
     // view에서 선택된 날짜 하이라이트 기능에서 쓰임
     func isSelected(id: Int) -> Bool {
-        id == selectedId
+        id == selectedDateModel.id
     }
     
     func toYearMonth(from index: Int) -> Int {
@@ -140,15 +147,15 @@ class CalendarMonthViewModel : ObservableObject{
     // 휴일과 일정을 같이 합쳐줄 코드 필요함 나중에는 특정 태그만 보고싶을때 필터링 할 수 있도록 하는 코드가 있어야하기 때문에 합쳐지는 쪽에서 태그보고 태그나오도록 만들어야함
     func holidays(for model: CalendarDateModel) -> [HolidayModel] {
         let holidays = holidayRepo.holidaysDictionary[model.holidayDicKey] ?? []
-
+        
         return holidays
     }
     
     func schedules(for model: CalendarDateModel) -> [ScheduleModel] {
         //지금 daycell 누를때마다 엄청많이 호출됨
         scheduleRepo.schedules(on: model.holidayDicKey)
-
-//        schedulesByDay[model.holidayDicKey] ?? []
+        
+        //        schedulesByDay[model.holidayDicKey] ?? []
     }
     
     func dateColor(for model: CalendarDateModel) -> Color {
@@ -169,6 +176,27 @@ class CalendarMonthViewModel : ObservableObject{
             return true
         }
         return false
+    }
+    func weekCount(for index: Int) -> Int {
+        let count = monthCache[index]?.count ?? 42
+        return max(1, count / 7)
+    }
+    //인덱스 보내서 그 인덱스에 해당하는 1일의 요일을 구해서 그 요일만큼의 인덱스에서 꺼내서 그걸 selected로 바꿔줌
+    func updateSelectedModel() {// 달력을 넘기면 넘긴달력의 1일로 선택일자를 바꾸기 위함
+        if currentIndex == Global.CENTER_PAGE {
+            selectedDateModel = todayDateModel
+            return
+        }
+        
+        monthGridViewDataUpdate(index: currentIndex)
+        guard let first = monthCache[currentIndex]?.first(where: {$0.type == .current && $0.day == 1}) else {
+            return
+        }
+        selectedDateModel = first
+        
+        
+        
+        
     }
     
     

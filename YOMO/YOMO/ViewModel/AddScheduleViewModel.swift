@@ -49,9 +49,10 @@ class AddScheduleViewModel: ObservableObject {
     @Published var title: String = ""
     @Published var startDate: Date {
         didSet {
-            endDate = Self.hourOnTheHour(date: startDate, addingHour: 1, minute: cal.component(.minute, from: startDate))
-            if endDate < startDate {
-                endDate = Self.hourOnTheHour(date: startDate, addingHour: 1)
+            let minimumDuration : TimeInterval = 60 * 60
+            if endDate < startDate  || endDate.timeIntervalSince(startDate) < minimumDuration {
+                endDate = Self.hourOnTheHour(date: startDate, addingHour: 1, minute: cal.component(.minute, from: startDate))
+//                endDate = Self.hourOnTheHour(date: startDate, addingHour: 1)
             }
         }
     }
@@ -110,7 +111,7 @@ class AddScheduleViewModel: ObservableObject {
             schedule.isRepeating = isRepeating
             schedule.notification = notification
             schedule.memo = memo
-            scheduleRepo.save()
+            try? scheduleRepo.save()
         }
         
         print("complete start date == \(startDate)")

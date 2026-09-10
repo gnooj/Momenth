@@ -13,5 +13,5 @@ protocol ScheduleRepositoryProtocol {
     func insert(_ schedule: ScheduleModel) throws
     func delete(_ schedule: ScheduleModel) throws
     func reload()
-    func save()
+    func save() throws
 }

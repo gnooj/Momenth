@@ -119,9 +119,5 @@ class CalendarDateGenerator {
         //다음달 일자 채워넣기
         return dates
     }
-    func uqdateToday() -> CalendarDateModel {
-        
-        return todayDateModel
-    }
 
 }

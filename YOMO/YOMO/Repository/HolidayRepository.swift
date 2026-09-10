@@ -14,6 +14,7 @@ class HolidayRepository : ObservableObject{
     var calendar = Calendar.current
     var loadedYears = Set<Int>()
     func setFixedHoliday(index : Int) -> Void {
+        print("SetFix 호춣 ~!")
         let offset = index - Global.CENTER_PAGE
         let targetDate = calendar.date(byAdding: .month, value: offset, to: Date())!
         let centerYear = calendar.component(.year, from: targetDate)

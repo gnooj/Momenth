@@ -34,6 +34,7 @@ struct AddScheduleView: View {
 
             HStack(){
                 DayCellContentView(calendarDateModel: mode.dateModel, holidays: holidays, dateColor: dateColor,schedules: schedules)
+                    .frame(width: 50, height: 80)
                 
                 Text("\(String(mode.dateModel.year))년\(String(mode.dateModel.month))월\(String(mode.dateModel.day))일")
                 Spacer()
